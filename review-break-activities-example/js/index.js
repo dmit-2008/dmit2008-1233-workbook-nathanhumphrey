@@ -9,8 +9,8 @@ HTML for list topic list item
 
 // wrap main logic in a block to prevent global scoping
 {
-  const topicForm = document.querySelector(".new-topic-form");
-  const topicList = document.querySelector(".topics-list");
+  const topicForm = document.querySelector('.new-topic-form');
+  const topicList = document.querySelector('.topics-list');
 
   /**
    * Adds a li element to the topic list.
@@ -25,23 +25,23 @@ HTML for list topic list item
     topicList.innerHTML += li;
   };
 
-  topicForm.addEventListener("submit", (event) => {
+  topicForm.addEventListener('submit', (event) => {
     event.preventDefault();
 
     // get the input value
-    const topicText = topicForm.elements["new-topic"].value.trim();
+    const topicText = topicForm.elements['new-topic'].value.trim();
 
     // validate the input
-    if (topicText === "") {
-      topicForm.elements["new-topic"].classList.add("is-invalid");
+    if (topicText === '') {
+      topicForm.elements['new-topic'].classList.add('is-invalid');
     } else {
-      topicForm.elements["new-topic"].classList.remove("is-invalid");
+      topicForm.elements['new-topic'].classList.remove('is-invalid');
       addNewTopic(topicText);
 
       // clear the form now that the topic has been added
       topicForm.reset();
       // focus the input so the user can enter another topic
-      topicForm.elements["new-topic"].focus();
+      topicForm.elements['new-topic'].focus();
     }
   });
 }
