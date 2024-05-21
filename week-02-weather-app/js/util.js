@@ -15,16 +15,16 @@ export const getJSON = async (url) => {
  * @param {Object} el - The reference to the display DOM element.
  */
 export const displayForecast = (data, el) => {
-  let list = document.createElement('ul'),
-    currDate,
-    nextDate,
-    currItem;
+  const list = document.createElement('ul');
+  let currDate;
+  let nextDate;
+  let currItem;
 
   data.forEach((item) => {
     // destructuring for display variables
-    let { dt_txt: date } = item,
-      { temp_max: high, temp_min: low } = item.main,
-      { main: cond } = item.weather[0];
+    const { dt_txt: date } = item;
+    const { temp_max: high, temp_min: low } = item.main;
+    const { main: cond } = item.weather[0];
 
     nextDate = date.split(' ')[0];
     if (currDate !== nextDate) {
@@ -61,13 +61,12 @@ export const displayForecast = (data, el) => {
  */
 export const displayWeather = (data, el) => {
   // DOM insertion points
-  let loc = el.querySelector('.details>.location'),
-    date = el.querySelector('.details>.date'),
-    conditions = el.querySelector('.details>.conditions'),
-    temp = el.querySelector('.details>.temp'),
-    sunrise = el.querySelector('.details>.sunrise'),
-    sunset = el.querySelector('.details>.sunset'),
-    forecast = el.querySelector('.forecast');
+  const loc = el.querySelector('.details>.location');
+  const date = el.querySelector('.details>.date');
+  const conditions = el.querySelector('.details>.conditions');
+  const temp = el.querySelector('.details>.temp');
+  const sunrise = el.querySelector('.details>.sunrise');
+  const sunset = el.querySelector('.details>.sunset');
 
   // display the current weather data
   loc.innerText = `${data.name}, ${data.sys.country}`;
