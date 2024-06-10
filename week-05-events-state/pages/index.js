@@ -1,3 +1,4 @@
+import NavBar from '@/components/NavBar';
 import { Box, Button, Container, TextField, Typography } from '@mui/material';
 import { useState } from 'react';
 
@@ -12,6 +13,7 @@ export default function Home() {
 
   return (
     <Container maxWidth="lg">
+      <NavBar />
       <Typography variant="h1">Events and State</Typography>
       <Box>
         <Button onClick={handleClick} variant="outlined">
