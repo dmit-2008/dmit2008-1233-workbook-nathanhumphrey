@@ -1,20 +1,23 @@
 import { GetApp } from '@mui/icons-material';
 import { Box, Button, TextField, Typography } from '@mui/material';
+import { useState } from 'react';
+import { weatherData } from '@/utils/weather-data';
 
 export default function WeatherForm({ weatherCallback }) {
-  // TODO: implement state for the input location
-  // render an error if the input is empty
+  const [location, setLocation] = useState('');
+  const [isValidLocation, setIsValidLocation] = useState(true);
 
   function handleSubmit(evt) {
     evt.preventDefault();
 
-    const location = evt.target.elements['location'].value.trim();
-
     if (location === '') {
       console.error('Location cannot be empty');
+      setIsValidLocation(false);
     } else {
       console.log(`Location: ${location}`);
-      weatherCallback('Received data from WeatherForm');
+      setIsValidLocation(true);
+      // The following will be replace with actual REST data
+      weatherCallback(weatherData);
     }
   }
 
@@ -23,10 +26,16 @@ export default function WeatherForm({ weatherCallback }) {
       <Typography variant="h2">Weather Form</Typography>
       <Box component="form" onSubmit={handleSubmit}>
         <TextField
+          error={!isValidLocation}
+          helperText={isValidLocation ? '' : 'Location cannot be empty'}
           variant="outlined"
           name="location"
           label="Location"
           size="small"
+          value={location}
+          onChange={(evt) => {
+            setLocation(evt.target.value);
+          }}
           sx={{ width: '15em' }}
         />
         <Button
