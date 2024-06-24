@@ -5,9 +5,13 @@ import {
   Button,
   Container,
   LinearProgress,
+  List,
+  ListItem,
+  ListItemText,
   Toolbar,
   Typography,
 } from '@mui/material';
+import { QuoteManager } from '@/utils/quote-manager';
 
 export default function Home() {
   const QUOTE_URL = 'https://api.quotable.io/random';
@@ -15,10 +19,13 @@ export default function Home() {
   const [randomQuote, setRandomQuote] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  const [savedQuotes, setSavedQuotes] = useState(null);
+
   function getRandomQuote() {
     setRandomQuote(null);
     setIsLoading(true);
 
+    // TODO: add this as a function in the quote manager
     fetch(QUOTE_URL)
       .then((res) => res.json())
       .then((json) => {
@@ -50,11 +57,45 @@ export default function Home() {
               <Typography variant="h2" mb={2}>
                 A Random Quote
               </Typography>
-              <Typography>
+              <Typography mb={2}>
                 {randomQuote.quote} - {randomQuote.author}
               </Typography>
+              <Button
+                variant="contained"
+                onClick={async () => {
+                  randomQuote.id = (
+                    await QuoteManager.saveQuote(randomQuote)
+                  ).id;
+
+                  // Now update the state
+                  setRandomQuote({ ...randomQuote });
+                  // Update the savedQuotes
+                  setSavedQuotes([...savedQuotes, randomQuote]);
+                }}
+              >
+                Save Quote
+              </Button>
             </Box>
           )}
+        </Box>
+        <Box mt={4}>
+          <Typography variant="h2">Previously Saved Quotes</Typography>
+          <Button
+            variant="contained"
+            onClick={async () => {
+              setSavedQuotes(await QuoteManager.getSavedQuotes());
+            }}
+          >
+            Fetch Saved Quotes
+          </Button>
+          <List>
+            {savedQuotes &&
+              savedQuotes.map((q) => (
+                <ListItem key={q.id}>
+                  <ListItemText primary={q.quote} secondary={q.author} />
+                </ListItem>
+              ))}
+          </List>
         </Box>
       </Container>
     </Box>
