@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   AppBar,
   Box,
@@ -20,6 +20,13 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
 
   const [savedQuotes, setSavedQuotes] = useState(null);
+
+  // Only on mount
+  useEffect(() => {
+    QuoteManager.getSavedQuotes().then((savedQuotes) => {
+      setSavedQuotes(savedQuotes);
+    });
+  }, []);
 
   function getRandomQuote() {
     setRandomQuote(null);
@@ -61,6 +68,15 @@ export default function Home() {
                 {randomQuote.quote} - {randomQuote.author}
               </Typography>
               <Button
+                disabled={
+                  randomQuote.id !== undefined ||
+                  (savedQuotes &&
+                    savedQuotes.find(
+                      (q) =>
+                        q.author === randomQuote.author &&
+                        q.quote === randomQuote.quote
+                    ))
+                }
                 variant="contained"
                 onClick={async () => {
                   randomQuote.id = (
@@ -80,14 +96,6 @@ export default function Home() {
         </Box>
         <Box mt={4}>
           <Typography variant="h2">Previously Saved Quotes</Typography>
-          <Button
-            variant="contained"
-            onClick={async () => {
-              setSavedQuotes(await QuoteManager.getSavedQuotes());
-            }}
-          >
-            Fetch Saved Quotes
-          </Button>
           <List>
             {savedQuotes &&
               savedQuotes.map((q) => (
