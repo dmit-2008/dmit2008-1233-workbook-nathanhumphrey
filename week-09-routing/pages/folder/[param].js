@@ -1,4 +1,5 @@
-import { Box, Typography } from '@mui/material';
+import Page from '@/components/Page';
+import { Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 
 export default function Param() {
@@ -6,9 +7,9 @@ export default function Param() {
   const { param } = router.query;
 
   return (
-    <Box>
+    <Page>
       <Typography variant="h1">Param Page</Typography>
       <Typography>The param is {param}</Typography>
-    </Box>
+    </Page>
   );
 }
