@@ -1,4 +1,4 @@
-import { AppBar, Box, Button, Toolbar, Typography } from '@mui/material';
+import { AppBar, Box, Button, Stack, Toolbar, Typography } from '@mui/material';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
@@ -15,7 +15,7 @@ export default function NavBar() {
             </Typography>
           </Link>
         </Box>
-        <Box>
+        <Stack direction="row" spacing={2}>
           <Link href="/about">
             <Button color="inherit">About</Button>
           </Link>
@@ -27,7 +27,7 @@ export default function NavBar() {
           >
             Random
           </Button>
-        </Box>
+        </Stack>
       </Toolbar>
     </AppBar>
   );
