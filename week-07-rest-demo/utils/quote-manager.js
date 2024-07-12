@@ -10,6 +10,17 @@ const QuoteManager = {
   },
 
   /**
+   * Fetches all quotes by an author from the backend
+   * @param {string} name - the name of the author to search for
+   * @returns {Promise<Array<{id:string, author:string, quote:string}>>} an array of quote objects
+   */
+  getQuotesByAuthor: async function (name) {
+    console.log('NAME', name);
+    const res = await fetch(`${BASE_URL}?author=${name}`);
+    return await res.json();
+  },
+
+  /**
    * Fetches all quotes from the backend
    * @returns {Promise<Array<{id:string, author:string, quote:string}>>} an array of quote objects
    */
