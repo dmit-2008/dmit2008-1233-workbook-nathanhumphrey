@@ -12,11 +12,6 @@ import { QuoteManager } from '@/utils/quote-manager';
 import NavBar from '@/components/NavBar';
 
 export default function QuotesByAuthor() {
-  const router = useRouter();
-  const { author } = router.query;
-
-  const [savedQuotes, setSavedQuotes] = useState(null);
-
   function properName(name) {
     return name
       .split('-')
@@ -24,12 +19,26 @@ export default function QuotesByAuthor() {
       .join(' ');
   }
 
-  // Only on mount
+  const router = useRouter();
+  const { author } = router.query;
+
+  const [savedQuotes, setSavedQuotes] = useState(null);
+
+  // Required on fresh page load to ensure the router.query object is ready
+  const [isNameSet, setIsNameSet] = useState(false);
+
+  // Once the router is ready, fetch quotes by the wildcard author
+  // See: https://nextjs.org/docs/pages/api-reference/functions/use-router 
   useEffect(() => {
-    QuoteManager.getQuotesByAuthor(properName(author)).then((savedQuotes) => {
-      setSavedQuotes(savedQuotes);
-    });
-  }, []);
+
+    if (router.isReady) {
+      QuoteManager.getQuotesByAuthor(properName(author)).then((quotes) => {
+        setSavedQuotes(quotes);
+      });
+      setIsNameSet(true);
+    }
+
+  }, [router.isReady]); // Run when router.isReady updates
 
   return (
     <Box component="main">
@@ -37,7 +46,7 @@ export default function QuotesByAuthor() {
       <Container maxWidth="lg" component="section">
         <Box mt={4}>
           <Typography variant="h2">
-            Saved Quotes by {properName(author)}
+            Saved Quotes {isNameSet && `by ${properName(author)}`}
           </Typography>
           <List>
             {savedQuotes &&
