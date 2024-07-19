@@ -11,14 +11,14 @@ import {
 import { QuoteManager } from '@/utils/quote-manager';
 import NavBar from '@/components/NavBar';
 
-export default function QuotesByAuthor() {
-  function properName(name) {
-    return name
-      .split('-')
-      .map((word) => word.charAt(0).toUpperCase() + word.substr(1))
-      .join(' ');
-  }
+function properName(name) {
+  return name
+    .split('-')
+    .map((word) => word.charAt(0).toUpperCase() + word.substr(1))
+    .join(' ');
+}
 
+export default function QuotesByAuthor() {
   const router = useRouter();
   const { author } = router.query;
 
@@ -28,16 +28,14 @@ export default function QuotesByAuthor() {
   const [isNameSet, setIsNameSet] = useState(false);
 
   // Once the router is ready, fetch quotes by the wildcard author
-  // See: https://nextjs.org/docs/pages/api-reference/functions/use-router 
+  // See: https://nextjs.org/docs/pages/api-reference/functions/use-router
   useEffect(() => {
-
     if (router.isReady) {
       QuoteManager.getQuotesByAuthor(properName(author)).then((quotes) => {
         setSavedQuotes(quotes);
       });
       setIsNameSet(true);
     }
-
   }, [router.isReady]); // Run when router.isReady updates
 
   return (
