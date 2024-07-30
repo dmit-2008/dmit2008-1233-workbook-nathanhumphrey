@@ -1,8 +1,6 @@
 import { render, screen, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { http, HttpResponse } from 'msw';
-import { setupServer } from 'msw/node';
-import { BASE_URL, RANDOM_QUOTE_URL } from '../utils/quote-manager.js';
+import { QuoteManager } from '../utils/quote-manager.js';
 
 import Home from '../pages/index.js';
 
@@ -10,40 +8,31 @@ import Home from '../pages/index.js';
 const AUTHOR = 'Jane Doe';
 const QUOTE = 'A famous quote';
 
-const handlers = [
-  http.get(RANDOM_QUOTE_URL, () => {
-    return HttpResponse.json({
-      _id: 'some-random-id',
-      author: AUTHOR,
-      content: QUOTE,
-    });
-  }),
-  http.get(BASE_URL, ({ request }) => {
-    const url = new URL(request.url);
-    const author = url.searchParams.get('author');
-    const quote = url.searchParams.get('quote');
-
-    if (author && quote) {
-      //  Check exists
-      return HttpResponse.json(false);
-    } else if (author) {
-      // Get all by author
-      return HttpResponse.json([]);
-    } else {
-      // Get all saved quotes
-      return HttpResponse.json([]);
-    }
-  }),
-];
-
-const server = setupServer(...handlers);
+// Setup a mock/spy for QuoteManager methods
+const originalGetRandomQuote = QuoteManager.getRandomQuote;
+const originalQuoteExists = QuoteManager.quoteExists;
 
 beforeAll(() => {
-  server.listen();
+  // Mock the necessary functions we need
+  QuoteManager.getRandomQuote = jest
+    .fn()
+    .mockResolvedValue({ author: AUTHOR, quote: QUOTE })
+    .mockName('mockGetRandomQuote');
+
+  QuoteManager.quoteExists = jest
+    .fn()
+    .mockResolvedValue(false)
+    .mockName('mockQuoteExists');
 });
 
+beforeEach(() => {
+  jest.clearAllMocks();
+});
+
+// Restore original implementations when done
 afterAll(() => {
-  server.close();
+  QuoteManager.getRandomQuote = originalGetRandomQuote;
+  QuoteManager.quoteExists = originalQuoteExists;
 });
 
 describe('Home page component', () => {
@@ -59,6 +48,13 @@ describe('Home page component', () => {
     // check to see that they are equal to the new values.
     expect(quoteElement).toHaveTextContent(QUOTE);
     expect(authorElement).toHaveTextContent(AUTHOR);
+
+    // check the calls to the mocks
+    expect(QuoteManager.getRandomQuote.mock.calls.length).toEqual(1);
+    expect(QuoteManager.quoteExists.mock.calls.length).toEqual(1);
+    expect(QuoteManager.quoteExists.mock.calls).toContainEqual([
+      { author: AUTHOR, quote: QUOTE },
+    ]);
   });
 
   test('Loads a new random quote when "Get a Quote" button is clicked', async () => {
@@ -71,16 +67,13 @@ describe('Home page component', () => {
     const NEW_AUTHOR = 'Clark Kent';
     const NEW_QUOTE = 'Up, up, and away!';
 
-    // create a new request with the new quote and author
-    server.use(
-      http.get(RANDOM_QUOTE_URL, () => {
-        return HttpResponse.json({
-          _id: 'some-random-id',
-          author: NEW_AUTHOR,
-          content: NEW_QUOTE,
-        });
-      })
-    );
+    // require an intermediate mock for get random quote
+    const origMock = QuoteManager.getRandomQuote;
+
+    QuoteManager.getRandomQuote = jest
+      .fn()
+      .mockResolvedValue({ author: NEW_AUTHOR, quote: NEW_QUOTE })
+      .mockName('newMockGetRandomQuote');
 
     // get the button element
     let buttonElement = screen.getByTestId('new-quote-button');
@@ -98,7 +91,7 @@ describe('Home page component', () => {
     expect(quoteElement).toHaveTextContent(NEW_QUOTE);
     expect(authorElement).toHaveTextContent(NEW_AUTHOR);
 
-    // remove the newly added handler
-    server.resetHandlers();
+    // reset the original mock function
+    QuoteManager.getRandomQuote = origMock;
   });
 });
