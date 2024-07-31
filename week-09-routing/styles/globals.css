@@ -1,0 +1,8 @@
+body {
+  background-color: #f9f9f9;
+}
+
+header.MuiAppBar-root a {
+  color: inherit;
+  text-decoration: none;
+}
