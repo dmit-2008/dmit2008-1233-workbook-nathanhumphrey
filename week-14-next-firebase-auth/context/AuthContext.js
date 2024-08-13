@@ -14,20 +14,29 @@ const defaultValue = {
       const cred = await signInWithEmailAndPassword(auth, email, password);
       const user = cred.user;
     } catch (error) {
+      // Probably you want display to the user
       const errorCode = error.code;
       const errorMessage = error.message;
       console.error(`Error signing in: ${errorCode} - ${errorMessage}`);
     }
   },
   signOut: async function () {
-    await signOut();
+    try {
+      await signOut(auth);
+    } catch (error) {
+      // Probably you want display to the user
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      console.error(`Error signing out: ${errorCode} - ${errorMessage}`);
+    }
   },
 };
 
 export const AuthContext = createContext({ user: defaultValue });
 
 const AuthProvider = ({ children }) => {
-  const [userState, setUserState] = useState(defaultValue);
+  const [userState, setUserState] = useState(null);
+  const [readyState, setReadyState] = useState(false);
 
   onAuthStateChanged(auth, (user) => {
     if (user) {
@@ -35,10 +44,13 @@ const AuthProvider = ({ children }) => {
     } else {
       setUserState(null);
     }
+    setReadyState(true);
   });
 
   return (
-    <AuthContext.Provider value={{ user: userState, setUser: setUserState }}>
+    <AuthContext.Provider
+      value={{ ...defaultValue, user: userState, isReady: readyState }}
+    >
       {children}
     </AuthContext.Provider>
   );
